@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -36,7 +37,6 @@ class Slider @JvmOverloads constructor(
     private var autoPlayHandler: Handler = Handler()
     private val autoPlayRunnable = Runnable {
         binding.viewPager.setCurrentItem(currentIndex + 1, true)
-        startAutoPlay()
     }
 
     private var imageSliderAdapter = ImageSliderAdapter()
@@ -120,38 +120,32 @@ class Slider @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        when (ev.action) {
-            MotionEvent.ACTION_DOWN -> {
-                isUserInteracting = true
-                stopAutoPlay()
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                isUserInteracting = false
-                if (slides.size > 1) startAutoPlay()
-            }
+        isUserInteracting = when (ev.action) {
+            MotionEvent.ACTION_DOWN -> true
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> false
+            else -> isUserInteracting
         }
+        shouldAutoPlayEnabled()
         return super.dispatchTouchEvent(ev)
     }
 
     fun setList(slideList: MutableList<SliderModel>) {
         slides.clear()
         slides.addAll(slideList)
-
         sliderCursor.createCursor(binding.cursorLayout, slides)
-
         imageSliderAdapter.submitList(slides)
         binding.viewPager.adapter = imageSliderAdapter
         binding.viewPager.offscreenPageLimit = slides.size
-        if (slides.size > 1 && !isUserInteracting) {
-            startAutoPlay()
-        } else {
-            stopAutoPlay()
-        }
+        shouldAutoPlayEnabled()
+    }
+
+    private fun shouldAutoPlayEnabled() {
+        if (!isUserInteracting && slides.size > 1) startAutoPlay() else stopAutoPlay()
     }
 
     private fun startAutoPlay() {
         stopAutoPlay()
-        autoPlayHandler.postDelayed(autoPlayRunnable, autoPlayInterval)
+        binding.viewPager.postDelayed(autoPlayRunnable, autoPlayInterval)
     }
 
     private fun stopAutoPlay() {
