@@ -29,8 +29,6 @@ class Slider @JvmOverloads constructor(
 
     private var sliderHeight: Int = 0
     private var sliderWidth: Int = 0
-    private var cursorSize: Int = 0
-    private var cursorMargin: Int = 0
 
     private var autoPlayInterval = 3000L
     private var isUserInteracting = false
@@ -48,14 +46,18 @@ class Slider @JvmOverloads constructor(
         setupViewPager()
     }
 
+    fun setList(slideList: MutableList<SliderModel>) {
+        slides.clear()
+        slides.addAll(slideList)
+        sliderCursor.createCursor(slides)
+        imageSliderAdapter.submitList(slides)
+        binding.viewPager.adapter = imageSliderAdapter
+        binding.viewPager.offscreenPageLimit = slides.size
+        shouldAutoPlayEnabled()
+    }
+
     private fun initializeAttributes(context: Context, attrs: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.Slider)
-        cursorSize = typedArray.getDimensionPixelSize(
-            Constants.CURSOR_SIZE_DIMEN, resources.getDimensionPixelSize(R.dimen.default_cursor_size)
-        )
-        cursorMargin = typedArray.getDimensionPixelSize(
-            Constants.CURSOR_MARGIN_DIMEN, resources.getDimensionPixelSize(R.dimen.default_cursor_margin)
-        )
         sliderHeight = typedArray.getDimensionPixelSize(
             Constants.SLIDER_HEIGHT_DIMEN, resources.getDimensionPixelSize(R.dimen.default_slider_height)
         )
@@ -67,9 +69,10 @@ class Slider @JvmOverloads constructor(
 
     private fun initView() {
         _binding = SliderBinding.inflate(LayoutInflater.from(context), this, true)
-        sliderCursor = SliderCursor(context, cursorSize, cursorMargin)
+        sliderCursor = SliderCursor(context)
         layoutParams = LayoutParams(sliderWidth, sliderHeight)
-        sliderCursor.createCursor(binding.cursorLayout, slides)
+        sliderCursor.createCursor(slides)
+        binding.sliderCursor.addView(sliderCursor)
     }
 
     private fun setupViewPager() {
@@ -104,9 +107,9 @@ class Slider @JvmOverloads constructor(
     private fun setTouchListener() {
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {
+                isUserInteracting = true
                 return true
             }
-
             override fun onSingleTapUp(e: MotionEvent): Boolean {
                 performClick()
                 return true
@@ -120,24 +123,11 @@ class Slider @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        isUserInteracting = when (ev.action) {
-            MotionEvent.ACTION_DOWN -> true
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> false
-            else -> isUserInteracting
-        }
+        isUserInteracting = ev.action != MotionEvent.ACTION_UP && ev.action != MotionEvent.ACTION_CANCEL
         shouldAutoPlayEnabled()
         return super.dispatchTouchEvent(ev)
     }
 
-    fun setList(slideList: MutableList<SliderModel>) {
-        slides.clear()
-        slides.addAll(slideList)
-        sliderCursor.createCursor(binding.cursorLayout, slides)
-        imageSliderAdapter.submitList(slides)
-        binding.viewPager.adapter = imageSliderAdapter
-        binding.viewPager.offscreenPageLimit = slides.size
-        shouldAutoPlayEnabled()
-    }
 
     private fun shouldAutoPlayEnabled() {
         if (!isUserInteracting && slides.size > 1) startAutoPlay() else stopAutoPlay()
