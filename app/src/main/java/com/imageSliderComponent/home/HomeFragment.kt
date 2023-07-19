@@ -1,0 +1,53 @@
+package com.imageSliderComponent.home
+
+import androidx.lifecycle.ViewModelProvider
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.imageSliderComponent.components.Slider
+import com.imageSliderComponent.databinding.FragmentHomeBinding
+import com.imageSliderComponent.models.SliderModel
+
+class HomeFragment : Fragment() {
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var slider: Slider
+
+    private lateinit var homeViewModel: HomeViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater,container,false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
+        listenEvents()
+    }
+
+    private fun init(){
+        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        homeViewModel.loadSlider()
+        slider = Slider(requireContext())
+    }
+
+    private fun listenEvents(){
+        homeViewModel.sliderList.observe(viewLifecycleOwner){
+            slider.setList(it)
+        }
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+}

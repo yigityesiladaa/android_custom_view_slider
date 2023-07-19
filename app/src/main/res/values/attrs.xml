@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Slider">
+        <attr name="sliderHeight" format="dimension" />
+        <attr name="sliderWidth" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="SliderCursor">
+        <attr name="cursorSize" format="dimension" />
+        <attr name="cursorMargin" format="dimension" />
+    </declare-styleable>
+</resources>

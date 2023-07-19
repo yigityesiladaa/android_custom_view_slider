@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_cursor_size">8dp</dimen>
+    <dimen name="default_cursor_margin">4dp</dimen>
+    <dimen name="default_slider_height">211dp</dimen>
+    <dimen name="default_slider_width">375dp</dimen>
+</resources>

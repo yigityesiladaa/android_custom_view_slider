@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ImageSliderComponent</string>
+    <string name="slider_caption_format">%3$d resim sayısı</string>
+</resources>
