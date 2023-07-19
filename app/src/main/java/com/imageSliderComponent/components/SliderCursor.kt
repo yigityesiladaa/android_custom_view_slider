@@ -2,12 +2,11 @@ package com.imageSliderComponent.components
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.imageSliderComponent.R
-import com.imageSliderComponent.constants.Constants
-import com.imageSliderComponent.databinding.SliderCursorBinding
+import com.imageSliderComponent.constants.Constants.SELECTED_CURSOR_SHAPE
+import com.imageSliderComponent.constants.Constants.UNSELECTED_CURSOR_SHAPE
 import com.imageSliderComponent.models.SliderModel
 
 class SliderCursor @JvmOverloads constructor(
@@ -43,7 +42,7 @@ class SliderCursor @JvmOverloads constructor(
                 layoutParams = LayoutParams(cursorSize, cursorSize).apply {
                     marginEnd = cursorMargin
                 }
-                setImageResource(if (index == 0) Constants.SELECTED_CURSOR_SHAPE else Constants.UNSELECTED_CURSOR_SHAPE)
+                setImageResource(if (index == 0) SELECTED_CURSOR_SHAPE else UNSELECTED_CURSOR_SHAPE)
             }
             cursorViews.add(cursorView)
             addView(cursorView)
@@ -51,10 +50,8 @@ class SliderCursor @JvmOverloads constructor(
     }
 
     fun updateCursor(position: Int) {
-        for (index in cursorViews.indices) {
-            cursorViews[index].setImageResource(
-                if (index == position) Constants.SELECTED_CURSOR_SHAPE else Constants.UNSELECTED_CURSOR_SHAPE
-            )
+        cursorViews.forEachIndexed { index, cursorView ->
+            cursorView.setImageResource(if (index == position) SELECTED_CURSOR_SHAPE else UNSELECTED_CURSOR_SHAPE)
         }
     }
 }

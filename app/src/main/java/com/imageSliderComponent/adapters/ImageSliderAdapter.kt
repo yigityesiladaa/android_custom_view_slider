@@ -15,11 +15,7 @@ class ImageSliderAdapter : RecyclerView.Adapter<ImageSliderAdapter.ImageSliderVi
 
     //TODO: Don't User Int.MAX_VALUE
     override fun getItemCount(): Int {
-        return if (slides.size > 1) {
-            Int.MAX_VALUE
-        } else {
-            slides.size
-        }
+        return if (slides.size > 1) Int.MAX_VALUE else slides.size
     }
 
     inner class ImageSliderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

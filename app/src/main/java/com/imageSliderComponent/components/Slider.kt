@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -90,7 +89,6 @@ class Slider @JvmOverloads constructor(
         })
     }
 
-    //TODO: Research
     private fun setOffscreenPageLimit() {
         binding.viewPager.adapter?.let { adapter ->
             val offscreenPageLimit = if (adapter.itemCount > 1) {
@@ -142,7 +140,6 @@ class Slider @JvmOverloads constructor(
         autoPlayHandler.removeCallbacks(autoPlayRunnable)
     }
 
-    //TODO: Research Security
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stopAutoPlay()
