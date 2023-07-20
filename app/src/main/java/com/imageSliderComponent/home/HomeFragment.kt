@@ -6,15 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.imageSliderComponent.components.Slider
 import com.imageSliderComponent.databinding.FragmentHomeBinding
-import com.imageSliderComponent.models.SliderModel
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var slider: Slider
 
     private lateinit var homeViewModel: HomeViewModel
 
@@ -35,15 +32,13 @@ class HomeFragment : Fragment() {
     private fun init(){
         homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         homeViewModel.loadSlider()
-        slider = Slider(requireContext())
     }
 
     private fun listenEvents(){
         homeViewModel.sliderList.observe(viewLifecycleOwner){
-            slider.setList(it)
+            binding.slider.setList(it)
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

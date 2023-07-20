@@ -2,20 +2,24 @@ package com.imageSliderComponent
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.imageSliderComponent.constants.Constants
-import com.imageSliderComponent.R
-import com.imageSliderComponent.databinding.ActivityMainBinding
+import com.imageSliderComponent.home.HomeFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_main)
 
-        binding.slider.setList(Constants.slides)
+        /*
+        Since it will be a single fragment for example purposes, I performed the process in this way.
+        If I'm going to handle more than one fragment, I would prefer to use Navigation Component.
+         */
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container, HomeFragment())
+                .commit()
+        }
 
     }
 }
