@@ -5,7 +5,7 @@ import com.imageSliderComponent.models.SliderModel
 
 object Constants {
 
-    val slides = mutableListOf(
+    val slides = listOf(
         SliderModel(
             url = "https://i.hizliresim.com/l0608s4.jpg",
             text = "İSTEĞİNE GÖRE SİGORTA PAYCELL'DE",
@@ -24,8 +24,4 @@ object Constants {
 
     const val SELECTED_CURSOR_SHAPE = R.drawable.selected_cursor
     const val UNSELECTED_CURSOR_SHAPE = R.drawable.unselected_cursor
-    const val CURSOR_SIZE_DIMEN = R.styleable.SliderCursor_cursorSize
-    const val CURSOR_MARGIN_DIMEN = R.styleable.SliderCursor_cursorMargin
-    const val SLIDER_HEIGHT_DIMEN = R.styleable.Slider_sliderHeight
-    const val SLIDER_WIDTH_DIMEN = R.styleable.Slider_sliderWidth
 }
