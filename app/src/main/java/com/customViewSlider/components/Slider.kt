@@ -2,6 +2,7 @@ package com.customViewSlider.components
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -28,9 +29,10 @@ class Slider<T> @JvmOverloads constructor(
 
     private var autoPlayInterval = 3000L
     private var isUserInteracting = false
-    private var autoPlayHandler: Handler = Handler()
+    private var autoPlayHandler: Handler = Handler(Looper.getMainLooper())
     private val autoPlayRunnable = Runnable {
         binding.viewPager.setCurrentItem(currentIndex + 1, true)
+        shouldAutoPlayEnabled()
     }
 
     private var sliderAdapter: SliderAdapter<T>? = null
