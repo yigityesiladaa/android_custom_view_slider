@@ -1,9 +1,9 @@
-package com.imageSliderComponent.home
+package com.customViewSlider.home
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.imageSliderComponent.constants.Constants
-import com.imageSliderComponent.models.SliderModel
+import com.customViewSlider.constants.Constants
+import com.customViewSlider.models.SliderModel
 
 class HomeViewModel : ViewModel() {
     var sliderList = MutableLiveData<List<SliderModel>>()

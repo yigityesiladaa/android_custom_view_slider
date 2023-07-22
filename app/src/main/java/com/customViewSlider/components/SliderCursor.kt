@@ -1,12 +1,12 @@
-package com.imageSliderComponent.components
+package com.customViewSlider.components
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.imageSliderComponent.R
-import com.imageSliderComponent.constants.Constants.SELECTED_CURSOR_SHAPE
-import com.imageSliderComponent.constants.Constants.UNSELECTED_CURSOR_SHAPE
+import com.customViewSlider.R
+import com.customViewSlider.constants.Constants.SELECTED_CURSOR_SHAPE
+import com.customViewSlider.constants.Constants.UNSELECTED_CURSOR_SHAPE
 
 class SliderCursor<T> @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0

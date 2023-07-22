@@ -1,7 +1,7 @@
-package com.imageSliderComponent.constants
+package com.customViewSlider.constants
 
-import com.imageSliderComponent.R
-import com.imageSliderComponent.models.SliderModel
+import com.customViewSlider.R
+import com.customViewSlider.models.SliderModel
 
 object Constants {
 

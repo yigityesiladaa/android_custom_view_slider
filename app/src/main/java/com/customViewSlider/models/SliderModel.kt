@@ -1,4 +1,4 @@
-package com.imageSliderComponent.models
+package com.customViewSlider.models
 
 data class SliderModel(
     val url: String?,

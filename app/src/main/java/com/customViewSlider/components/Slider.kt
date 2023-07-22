@@ -1,16 +1,17 @@
-package com.imageSliderComponent.components
+package com.customViewSlider.components
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager2.widget.ViewPager2
-import com.imageSliderComponent.R
-import com.imageSliderComponent.adapters.SliderAdapter
-import com.imageSliderComponent.databinding.SliderBinding
+import com.customViewSlider.R
+import com.customViewSlider.adapters.SliderAdapter
+import com.customViewSlider.databinding.SliderBinding
 import java.util.*
 
 class Slider<T> @JvmOverloads constructor(
@@ -28,9 +29,10 @@ class Slider<T> @JvmOverloads constructor(
 
     private var autoPlayInterval = 3000L
     private var isUserInteracting = false
-    private var autoPlayHandler: Handler = Handler()
+    private var autoPlayHandler: Handler = Handler(Looper.getMainLooper())
     private val autoPlayRunnable = Runnable {
         binding.viewPager.setCurrentItem(currentIndex + 1, true)
+        shouldAutoPlayEnabled()
     }
 
     private var sliderAdapter: SliderAdapter<T>? = null
@@ -144,5 +146,6 @@ class Slider<T> @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stopAutoPlay()
+        _binding = null
     }
 }
