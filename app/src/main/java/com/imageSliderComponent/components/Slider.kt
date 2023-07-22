@@ -1,6 +1,5 @@
 package com.imageSliderComponent.components
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
@@ -10,20 +9,18 @@ import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.imageSliderComponent.R
-import com.imageSliderComponent.adapters.ImageSliderAdapter
-import com.imageSliderComponent.constants.Constants
+import com.imageSliderComponent.adapters.SliderAdapter
 import com.imageSliderComponent.databinding.SliderBinding
-import com.imageSliderComponent.models.SliderModel
 import java.util.*
 
-class Slider @JvmOverloads constructor(
+class Slider<T> @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : ConstraintLayout(context, attrs) {
 
     private var _binding: SliderBinding? = null
     private val binding get() = _binding!!
 
-    private var slides = mutableListOf<SliderModel>()
+    private var items = listOf<T>()
     private var currentIndex = 0
 
     private var sliderHeight: Int = 0
@@ -36,8 +33,8 @@ class Slider @JvmOverloads constructor(
         binding.viewPager.setCurrentItem(currentIndex + 1, true)
     }
 
-    private var imageSliderAdapter = ImageSliderAdapter()
-    private lateinit var sliderCursor: SliderCursor
+    private var sliderAdapter: SliderAdapter<T>? = null
+    private lateinit var sliderCursor: SliderCursor<T>
 
     init {
         initializeAttributes(context, attrs)
@@ -45,32 +42,38 @@ class Slider @JvmOverloads constructor(
         setupViewPager()
     }
 
-    fun setList(slideList: MutableList<SliderModel>) {
-        slides.clear()
-        slides.addAll(slideList)
-        sliderCursor.createCursor(slides)
-        imageSliderAdapter.submitList(slides)
-        binding.viewPager.adapter = imageSliderAdapter
-        binding.viewPager.offscreenPageLimit = slides.size
+    fun setAdapter(adapter: SliderAdapter<T>) {
+        sliderAdapter = adapter
+    }
+
+    fun setList(itemList: List<T>) {
+        if(sliderAdapter == null){
+            throw java.lang.IllegalStateException("You must set an adapter using setAdapter method before calling setList")
+        }
+        items = itemList
+        sliderCursor.createCursor(itemList)
+        sliderAdapter?.submitList(itemList)
+        binding.viewPager.adapter = sliderAdapter
+        binding.viewPager.offscreenPageLimit = itemList.size
         shouldAutoPlayEnabled()
     }
 
     private fun initializeAttributes(context: Context, attrs: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.Slider)
         sliderHeight = typedArray.getDimensionPixelSize(
-            Constants.SLIDER_HEIGHT_DIMEN, resources.getDimensionPixelSize(R.dimen.default_slider_height)
+            R.styleable.Slider_sliderHeight, resources.getDimensionPixelSize(R.dimen.default_slider_height)
         )
         sliderWidth = typedArray.getDimensionPixelSize(
-            Constants.SLIDER_WIDTH_DIMEN, resources.getDimensionPixelSize(R.dimen.default_slider_width)
+            R.styleable.Slider_sliderWidth, resources.getDimensionPixelSize(R.dimen.default_slider_width)
         )
         typedArray.recycle()
     }
 
     private fun initView() {
         _binding = SliderBinding.inflate(LayoutInflater.from(context), this, true)
-        sliderCursor = SliderCursor(context)
         layoutParams = LayoutParams(sliderWidth, sliderHeight)
-        sliderCursor.createCursor(slides)
+        binding.viewPager.adapter = sliderAdapter
+        sliderCursor = SliderCursor(context)
         binding.sliderCursor.addView(sliderCursor)
     }
 
@@ -83,7 +86,7 @@ class Slider @JvmOverloads constructor(
     private fun registerPageChangeCallback() {
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                currentIndex = position % slides.size
+                currentIndex = position % items.size
                 sliderCursor.updateCursor(currentIndex)
             }
         })
@@ -100,8 +103,7 @@ class Slider @JvmOverloads constructor(
         }
     }
 
-    //TODO: Refactor By ListSize
-    @SuppressLint("ClickableViewAccessibility")
+    @Suppress("ClickableViewAccessibility")
     private fun setTouchListener() {
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {
@@ -126,9 +128,8 @@ class Slider @JvmOverloads constructor(
         return super.dispatchTouchEvent(ev)
     }
 
-
     private fun shouldAutoPlayEnabled() {
-        if (!isUserInteracting && slides.size > 1) startAutoPlay() else stopAutoPlay()
+        if (!isUserInteracting && items.size > 1) startAutoPlay() else stopAutoPlay()
     }
 
     private fun startAutoPlay() {

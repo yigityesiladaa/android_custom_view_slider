@@ -7,9 +7,8 @@ import android.widget.LinearLayout
 import com.imageSliderComponent.R
 import com.imageSliderComponent.constants.Constants.SELECTED_CURSOR_SHAPE
 import com.imageSliderComponent.constants.Constants.UNSELECTED_CURSOR_SHAPE
-import com.imageSliderComponent.models.SliderModel
 
-class SliderCursor @JvmOverloads constructor(
+class SliderCursor<T> @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
@@ -29,11 +28,10 @@ class SliderCursor @JvmOverloads constructor(
         cursorMargin = typedArray.getDimensionPixelSize(
             R.styleable.SliderCursor_cursorMargin, resources.getDimensionPixelSize(R.dimen.default_cursor_margin)
         )
-
         typedArray.recycle()
     }
 
-    fun createCursor(slides: List<SliderModel>) {
+    fun createCursor(slides: List<T>) {
         cursorViews.clear()
         removeAllViews()
 
