@@ -1,4 +1,4 @@
-package com.imageSliderComponent
+package com.customViewSlider
 
 import org.junit.Test
 

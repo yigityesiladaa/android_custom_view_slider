@@ -1,4 +1,4 @@
-package com.imageSliderComponent.adapters
+package com.customViewSlider.adapters
 
 import android.view.LayoutInflater
 import android.view.View

@@ -1,6 +1,5 @@
-package com.imageSliderComponent.home
+package com.customViewSlider.home
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,10 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.imageSliderComponent.R
-import com.imageSliderComponent.adapters.SliderAdapter
-import com.imageSliderComponent.databinding.FragmentHomeBinding
-import com.imageSliderComponent.models.SliderModel
+import com.customViewSlider.R
+import com.customViewSlider.adapters.SliderAdapter
+import com.customViewSlider.databinding.FragmentHomeBinding
+import com.customViewSlider.models.SliderModel
 
 class HomeFragment : Fragment() {
 

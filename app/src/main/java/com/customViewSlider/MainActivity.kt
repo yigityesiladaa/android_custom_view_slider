@@ -1,9 +1,9 @@
-package com.imageSliderComponent
+package com.customViewSlider
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.imageSliderComponent.home.HomeFragment
+import com.customViewSlider.home.HomeFragment
 
 class MainActivity : AppCompatActivity() {
 

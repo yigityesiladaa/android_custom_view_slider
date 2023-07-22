@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.imageSliderComponent'
+    namespace 'com.customViewSlider'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.imageSliderComponent"
+        applicationId "com.customViewSlider"
         minSdk 24
         targetSdk 33
         versionCode 1
