@@ -8,9 +8,9 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.viewpager2.widget.ViewPager2
-import com.imageSliderComponent.R
+import com.customViewSlider.R
+import com.customViewSlider.databinding.SliderBinding
 import com.imageSliderComponent.adapters.SliderAdapter
-import com.imageSliderComponent.databinding.SliderBinding
 import java.util.*
 
 class Slider<T> @JvmOverloads constructor(
