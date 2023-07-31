@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">ImageSliderComponent</string>
     <string name="slider_caption_format">%3$d resim sayısı</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="open_slider_page">Open Slider</string>
+    <string name="next_page_text">Next Page</string>
+    <string name="back_text">Turn Back</string>
+    <string name="previous_page_text">Previous Page</string>
 </resources>

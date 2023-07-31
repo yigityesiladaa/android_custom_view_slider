@@ -1,4 +1,4 @@
-package com.customViewSlider.home
+package com.customViewSlider.ui.home
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

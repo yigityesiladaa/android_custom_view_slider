@@ -8,15 +8,18 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.customViewSlider.R
-import com.customViewSlider.adapters.SliderAdapter
+import com.customViewSlider.adapters.BaseSliderAdapter
 import com.customViewSlider.databinding.SliderBinding
 import java.util.*
 
-class Slider<T> @JvmOverloads constructor(
+class Slider<T : Any> @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
-) : ConstraintLayout(context, attrs) {
+) : ConstraintLayout(context, attrs), LifecycleEventObserver {
 
     private var _binding: SliderBinding? = null
     private val binding get() = _binding!!
@@ -30,13 +33,15 @@ class Slider<T> @JvmOverloads constructor(
     private var autoPlayInterval = 3000L
     private var isUserInteracting = false
     private var autoPlayHandler: Handler = Handler(Looper.getMainLooper())
+    private var isAutoPlayHandlerPosted = false
+
     private val autoPlayRunnable = Runnable {
-        binding.viewPager.setCurrentItem(currentIndex + 1, true)
+        binding.viewPager.setCurrentItem((currentIndex + 1) % items.size, true)
         shouldAutoPlayEnabled()
     }
 
-    private var sliderAdapter: SliderAdapter<T>? = null
-    private lateinit var sliderCursor: SliderCursor<T>
+    private var sliderAdapter: BaseSliderAdapter<T, *>? = null
+    private lateinit var sliderCursor: SliderCursor
 
     init {
         initializeAttributes(context, attrs)
@@ -44,20 +49,21 @@ class Slider<T> @JvmOverloads constructor(
         setupViewPager()
     }
 
-    fun setAdapter(adapter: SliderAdapter<T>) {
+    fun setAdapter(adapter: BaseSliderAdapter<T, *>) {
         sliderAdapter = adapter
     }
 
     fun setList(itemList: List<T>) {
-        if(sliderAdapter == null){
-            throw java.lang.IllegalStateException("You must set an adapter using setAdapter method before calling setList")
-        }
-        items = itemList
-        sliderCursor.createCursor(itemList)
-        sliderAdapter?.submitList(itemList)
-        binding.viewPager.adapter = sliderAdapter
-        binding.viewPager.offscreenPageLimit = itemList.size
-        shouldAutoPlayEnabled()
+        sliderAdapter?.let { adapter ->
+            items = itemList
+            sliderCursor.createCursor(itemList.size)
+            adapter.submitList(itemList)
+            binding.viewPager.run {
+                this.adapter = adapter
+                offscreenPageLimit = itemList.size
+            }
+            shouldAutoPlayEnabled()
+        } ?: throw IllegalStateException("You must set an adapter using setAdapter method before calling setList")
     }
 
     private fun initializeAttributes(context: Context, attrs: AttributeSet?) {
@@ -74,8 +80,8 @@ class Slider<T> @JvmOverloads constructor(
     private fun initView() {
         _binding = SliderBinding.inflate(LayoutInflater.from(context), this, true)
         layoutParams = LayoutParams(sliderWidth, sliderHeight)
-        binding.viewPager.adapter = sliderAdapter
         sliderCursor = SliderCursor(context)
+        binding.viewPager.adapter = sliderAdapter
         binding.sliderCursor.addView(sliderCursor)
     }
 
@@ -95,13 +101,15 @@ class Slider<T> @JvmOverloads constructor(
     }
 
     private fun setOffscreenPageLimit() {
-        binding.viewPager.adapter?.let { adapter ->
-            val offscreenPageLimit = if (adapter.itemCount > 1) {
-                adapter.itemCount - 2
-            } else {
-                ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+        binding.run {
+            viewPager.adapter?.let { adapter ->
+                val offscreenPageLimit = if (adapter.itemCount > 1) {
+                    adapter.itemCount - 2
+                } else {
+                    ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+                }
+                viewPager.offscreenPageLimit = offscreenPageLimit
             }
-            binding.viewPager.offscreenPageLimit = offscreenPageLimit
         }
     }
 
@@ -110,10 +118,6 @@ class Slider<T> @JvmOverloads constructor(
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {
                 isUserInteracting = true
-                return true
-            }
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                performClick()
                 return true
             }
         })
@@ -125,26 +129,53 @@ class Slider<T> @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        isUserInteracting = ev.action != MotionEvent.ACTION_UP && ev.action != MotionEvent.ACTION_CANCEL
-        shouldAutoPlayEnabled()
+        val isInteractingNow = ev.action != MotionEvent.ACTION_UP && ev.action != MotionEvent.ACTION_CANCEL
+        if (isUserInteracting != isInteractingNow) {
+            isUserInteracting = isInteractingNow
+            shouldAutoPlayEnabled()
+        }
         return super.dispatchTouchEvent(ev)
     }
 
     private fun shouldAutoPlayEnabled() {
-        if (!isUserInteracting && items.size > 1) startAutoPlay() else stopAutoPlay()
+        if (!isUserInteracting && items.size > 1) {
+            if (isAutoPlayHandlerPosted) {
+                stopAutoPlay()
+            }
+            startAutoPlay()
+        } else {
+            if (isAutoPlayHandlerPosted) {
+                stopAutoPlay()
+            }
+        }
     }
 
     private fun startAutoPlay() {
         stopAutoPlay()
-        binding.viewPager.postDelayed(autoPlayRunnable, autoPlayInterval)
+        autoPlayHandler.postDelayed(autoPlayRunnable, autoPlayInterval)
+        isAutoPlayHandlerPosted = true
     }
 
     private fun stopAutoPlay() {
         autoPlayHandler.removeCallbacks(autoPlayRunnable)
+        isAutoPlayHandlerPosted = false
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        stopAutoPlay()
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event) {
+            Lifecycle.Event.ON_PAUSE -> {
+                stopAutoPlay()
+                source.lifecycle.removeObserver(this)
+            }
+            Lifecycle.Event.ON_RESUME -> {
+                source.lifecycle.addObserver(this)
+            }
+            Lifecycle.Event.ON_DESTROY -> {
+                stopAutoPlay()
+                source.lifecycle.removeObserver(this)
+                _binding = null
+            }
+            else -> {}
+        }
     }
 }

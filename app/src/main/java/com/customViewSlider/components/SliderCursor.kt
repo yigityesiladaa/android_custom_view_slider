@@ -8,7 +8,7 @@ import com.customViewSlider.R
 import com.customViewSlider.constants.Constants.SELECTED_CURSOR_SHAPE
 import com.customViewSlider.constants.Constants.UNSELECTED_CURSOR_SHAPE
 
-class SliderCursor<T> @JvmOverloads constructor(
+class SliderCursor @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
@@ -31,11 +31,11 @@ class SliderCursor<T> @JvmOverloads constructor(
         typedArray.recycle()
     }
 
-    fun createCursor(slides: List<T>) {
+    fun createCursor(itemCount: Int) {
         cursorViews.clear()
         removeAllViews()
 
-        for (index in slides.indices) {
+        for (index in 0 until itemCount) {
             val cursorView = ImageView(context).apply {
                 layoutParams = LayoutParams(cursorSize, cursorSize).apply {
                     marginEnd = cursorMargin
