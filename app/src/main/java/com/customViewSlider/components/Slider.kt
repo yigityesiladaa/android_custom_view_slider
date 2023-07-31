@@ -44,7 +44,7 @@ class Slider<T : Any> @JvmOverloads constructor(
     private lateinit var sliderCursor: SliderCursor
 
     init {
-        initializeAttributes(context, attrs)
+        initializeAttributes(attrs)
         initView()
         setupViewPager()
     }
@@ -66,7 +66,7 @@ class Slider<T : Any> @JvmOverloads constructor(
         } ?: throw IllegalStateException("You must set an adapter using setAdapter method before calling setList")
     }
 
-    private fun initializeAttributes(context: Context, attrs: AttributeSet?) {
+    private fun initializeAttributes(attrs: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.Slider)
         sliderHeight = typedArray.getDimensionPixelSize(
             R.styleable.Slider_sliderHeight, resources.getDimensionPixelSize(R.dimen.default_slider_height)
@@ -138,20 +138,11 @@ class Slider<T : Any> @JvmOverloads constructor(
     }
 
     private fun shouldAutoPlayEnabled() {
-        if (!isUserInteracting && items.size > 1) {
-            if (isAutoPlayHandlerPosted) {
-                stopAutoPlay()
-            }
-            startAutoPlay()
-        } else {
-            if (isAutoPlayHandlerPosted) {
-                stopAutoPlay()
-            }
-        }
+        if (isAutoPlayHandlerPosted) stopAutoPlay()
+        if (!isUserInteracting && items.size > 1) startAutoPlay() else stopAutoPlay()
     }
 
     private fun startAutoPlay() {
-        stopAutoPlay()
         autoPlayHandler.postDelayed(autoPlayRunnable, autoPlayInterval)
         isAutoPlayHandlerPosted = true
     }
@@ -163,15 +154,10 @@ class Slider<T : Any> @JvmOverloads constructor(
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
-            Lifecycle.Event.ON_PAUSE -> {
-                stopAutoPlay()
-                source.lifecycle.removeObserver(this)
-            }
-            Lifecycle.Event.ON_RESUME -> {
-                source.lifecycle.addObserver(this)
-            }
+            Lifecycle.Event.ON_PAUSE -> if (isAutoPlayHandlerPosted) stopAutoPlay()
+            Lifecycle.Event.ON_RESUME -> shouldAutoPlayEnabled()
             Lifecycle.Event.ON_DESTROY -> {
-                stopAutoPlay()
+                if (isAutoPlayHandlerPosted) stopAutoPlay()
                 source.lifecycle.removeObserver(this)
                 _binding = null
             }
